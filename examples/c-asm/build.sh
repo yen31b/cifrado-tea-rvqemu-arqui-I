@@ -54,6 +54,23 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Compile tea.c to object file
+riscv64-unknown-elf-gcc \
+    -march=rv32im \
+    -mabi=ilp32 \
+    -nostdlib \
+    -ffreestanding \
+    -g3 \
+    -gdwarf-4 \
+    -c \
+    tea.c \
+    -o tea.o
+
+if [ $? -ne 0 ]; then
+    echo "tea.c compilation failed"
+    exit 1
+fi
+
 # Link object files together
 riscv64-unknown-elf-gcc \
     -march=rv32im \
@@ -65,6 +82,7 @@ riscv64-unknown-elf-gcc \
     startup.o \
     example.o \
     math_asm.o \
+    tea.o \
     -T linker.ld \
     -o example.elf
 
