@@ -1,11 +1,14 @@
+
 // Simple C program that calls assembly function
 // This demonstrates C+assembly integration in RISC-V
 #include <stdint.h>
 
 // Functions defined in C and Assembly
 extern int sum_to_n(int n);
+// TEA functions in Assembly
 extern void tea_decrypt_asm(uint32_t v[2], const uint32_t key[4]);
 extern void tea_encrypt_asm(uint32_t v[2], const uint32_t key[4]);
+// TEA functions in C
 extern void tea_encrypt(uint32_t v[2], const uint32_t key[4]);
 extern void tea_decrypt(uint32_t v[2], const uint32_t key[4]);
 
@@ -64,28 +67,61 @@ void print_unsigned(uint32_t num) {
     }
 }
 
-// Entry point for C program
-void main() {
-    // Test the assembly function with different values
-    /*int test_values[] = {5, 10, 15, 0, -1};
-    int num_tests = 5;
-    
-    print_string("Testing sum_to_n assembly function:\n");
-    
-    for (int i = 0; i < num_tests; i++) {
-        int n = test_values[i];
-        int result = sum_to_n(n);
-        
-        print_string("sum_to_n(");
-        print_number(n);
-        print_string(") = ");
-        print_number(result);
+
+// Imprime un bloque de 8 bytes en hexadecimal
+void print_block_hex(uint32_t v[2]) {
+    for (int i = 0; i < 2; i++) {
+        for (int j = 28; j >= 0; j -= 4) {
+            uint8_t nibble = (v[i] >> j) & 0xF;
+            print_char(nibble < 10 ? '0' + nibble : 'A' + (nibble - 10));
+        }
+        print_char(' ');
+    }
+}
+
+// Procesa una cadena: padding, cifrado, descifrado y muestra resultados
+void process_string(const char* str, uint32_t key[4]) {
+    print_string("Original: ");
+    print_string(str);
+    print_string("\n");
+
+    int len = 0;
+    while (str[len]) len++;
+    int blocks = (len + 7) / 8;
+
+    for (int b = 0; b < blocks; b++) {
+        uint8_t block[8] = {0};
+        for (int i = 0; i < 8; i++) {
+            int idx = b * 8 + i;
+            if (idx < len) block[i] = str[idx];
+        }
+        uint32_t v[2];
+        v[0] = ((uint32_t)block[0]) | ((uint32_t)block[1] << 8) | ((uint32_t)block[2] << 16) | ((uint32_t)block[3] << 24);
+        v[1] = ((uint32_t)block[4]) | ((uint32_t)block[5] << 8) | ((uint32_t)block[6] << 16) | ((uint32_t)block[7] << 24);
+
+        print_string("Block: ");
+        print_block_hex(v);
+        print_string("\n");
+
+        tea_encrypt_asm(v, key);
+        print_string("Encrypted: ");
+        print_block_hex(v);
+        print_string("\n");
+
+        tea_decrypt_asm(v, key);
+        print_string("Decrypted: ");
+        // Imprime como texto
+        for (int i = 0; i < 4; i++) print_char((v[0] >> (i * 8)) & 0xFF);
+        for (int i = 0; i < 4; i++) print_char((v[1] >> (i * 8)) & 0xFF);
         print_string("\n");
     }
-    
-    print_string("Tests completed.\n");*/
+}
 
 
+// Entry point for C program
+void main() {
+    // Pruebas previas (comentadas, puedes descomentar para comparar)
+    /*
     // Test TEA encryption/decryption (C)
     uint32_t v[2] = {12345, 67890}; // Bloque de datos
     uint32_t key[4] = {1, 2, 3, 4}; // Clave de 128 bits
@@ -138,8 +174,22 @@ void main() {
     print_string(", ");
     print_unsigned(v_asm[1]);
     print_string("\n");
+    */
 
-    
+   // predetermined blocks test 
+    const char* test_strings[] = {
+        "Hola mundo",
+        "TEA RISC-V",
+        "12345678",
+        "Test largo para padding"
+    };
+    int num_tests = 4;
+    uint32_t key[4] = {1, 2, 3, 4}; // key 128
+    for (int t = 0; t < num_tests; t++) {
+        print_string("\n---\n");
+        process_string(test_strings[t], key);
+    }
+
     // Infinite loop to keep program running
     while (1) {
         __asm__ volatile ("nop");
