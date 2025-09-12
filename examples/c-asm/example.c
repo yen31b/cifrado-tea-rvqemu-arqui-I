@@ -86,11 +86,11 @@ void main() {
     print_string("Tests completed.\n");*/
 
 
-    // Test TEA encryption/decryption
+    // Test TEA encryption/decryption (C)
     uint32_t v[2] = {12345, 67890}; // Bloque de datos
     uint32_t key[4] = {1, 2, 3, 4}; // Clave de 128 bits
 
-    print_string("Testing TEA encryption/decryption:\n");
+    print_string("Testing TEA encryption/decryption (C):\n");
     print_string("Original: ");
     print_unsigned(v[0]);
     print_string(", ");
@@ -108,9 +108,35 @@ void main() {
     tea_decrypt(v, key);
 
     print_string("Decrypted: ");
-    print_number(v[0]);
+    print_unsigned(v[0]);
     print_string(", ");
-    print_number(v[1]);
+    print_unsigned(v[1]);
+    print_string("\n");
+
+    // Test TEA encryption/decryption (ASM)
+    uint32_t v_asm[2] = {12345, 67890};
+
+    print_string("\nTesting TEA encryption/decryption (ASM):\n");
+    print_string("Original: ");
+    print_unsigned(v_asm[0]);
+    print_string(", ");
+    print_unsigned(v_asm[1]);
+    print_string("\n");
+
+    tea_encrypt_asm(v_asm, key);
+
+    print_string("Encrypted: ");
+    print_unsigned(v_asm[0]);
+    print_string(", ");
+    print_unsigned(v_asm[1]);
+    print_string("\n");
+
+    tea_decrypt_asm(v_asm, key);
+
+    print_string("Decrypted: ");
+    print_unsigned(v_asm[0]);
+    print_string(", ");
+    print_unsigned(v_asm[1]);
     print_string("\n");
 
     
