@@ -2,8 +2,10 @@
 // This demonstrates C+assembly integration in RISC-V
 #include <stdint.h>
 
-// Assembly function declaration
+// Functions defined in C and Assembly
 extern int sum_to_n(int n);
+extern void tea_decrypt_asm(uint32_t v[2], const uint32_t key[4]);
+extern void tea_encrypt_asm(uint32_t v[2], const uint32_t key[4]);
 extern void tea_encrypt(uint32_t v[2], const uint32_t key[4]);
 extern void tea_decrypt(uint32_t v[2], const uint32_t key[4]);
 
