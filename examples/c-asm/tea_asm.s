@@ -3,7 +3,7 @@
 
 # Encrypt function
 tea_encrypt_asm:
-    addi    sp, sp, -16         # Reserva espacio en stack
+    addi    sp, sp, -16         #Reserva espacio en stack
     sw      s0, 0(sp)
     sw      s1, 4(sp)
     sw      s2, 8(sp)
