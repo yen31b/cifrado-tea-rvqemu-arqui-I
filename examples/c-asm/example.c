@@ -89,6 +89,12 @@ void process_string(const char* str, uint32_t key[4]) {
     while (str[len]) len++;
     int blocks = (len + 7) / 8;
 
+    // arrays to save encrypted and decrypted blocks to show at the end of thre process
+    uint32_t encrypted_blocks[blocks][2];
+    uint32_t decrypted_blocks[blocks][2];
+
+
+    // Process each block 
     for (int b = 0; b < blocks; b++) {
         uint8_t block[8] = {0};
         for (int i = 0; i < 8; i++) {
@@ -99,18 +105,25 @@ void process_string(const char* str, uint32_t key[4]) {
         v[0] = ((uint32_t)block[0]) | ((uint32_t)block[1] << 8) | ((uint32_t)block[2] << 16) | ((uint32_t)block[3] << 24);
         v[1] = ((uint32_t)block[4]) | ((uint32_t)block[5] << 8) | ((uint32_t)block[6] << 16) | ((uint32_t)block[7] << 24);
 
-        print_string("Block: ");
+        print_string("Block in hexadecimal (size 8 bytes -> 64bits): ");
         print_block_hex(v);
         print_string("\n");
 
         tea_encrypt_asm(v, key);
+        // save encrypted block
+        encrypted_blocks[b][0] = v[0];
+        encrypted_blocks[b][1] = v[1];
+
         print_string("Encrypted: ");
         print_block_hex(v);
         print_string("\n");
 
         tea_decrypt_asm(v, key);
-        print_string("Decrypted: ");
+        // save decrypted block
+        decrypted_blocks[b][0] = v[0];
+        decrypted_blocks[b][1] = v[1];
 
+        print_string("Decrypted: ");
         //Show padding with '_' character
         for (int i = 0; i < 4; i++) {
             char c = (v[0] >> (i * 8)) & 0xFF;
@@ -124,6 +137,30 @@ void process_string(const char* str, uint32_t key[4]) {
         }
         print_string("\n");
     }
+
+    //Show all block encrypted
+    print_string("\n Final result: ");
+
+    print_string("\n Complete block encrypted: ");
+    for (int b = 0; b < blocks; b++) {
+        print_block_hex(encrypted_blocks[b]);
+    }
+
+    //Show all block decrypted
+    print_string("\n Complete block decrypted: ");
+    for (int b = 0; b < blocks; b++) {
+        for (int i = 0; i < 4; i++) {
+            char c = (decrypted_blocks[b][0] >> (i * 8)) & 0xFF;
+            if (c == 0) print_char('_');
+            else print_char(c);
+        }
+        for (int i = 0; i < 4; i++) {
+            char c = (decrypted_blocks[b][1] >> (i * 8)) & 0xFF;
+            if (c == 0) print_char('_');
+            else print_char(c);
+        }
+    }
+    print_string("\n");
 }
 
 
@@ -199,7 +236,7 @@ void main() {
     process_string(prueba2, clave2);        
 
    //Test blocks 
-
+   print_string("-----------\n");
    print_string("\n Other Tests blocks\n");
     const char* test_strings[] = {
         "Hello world",
