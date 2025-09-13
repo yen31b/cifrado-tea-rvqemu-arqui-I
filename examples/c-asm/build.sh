@@ -54,6 +54,40 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Compile tea.c to object file
+riscv64-unknown-elf-gcc \
+    -march=rv32im \
+    -mabi=ilp32 \
+    -nostdlib \
+    -ffreestanding \
+    -g3 \
+    -gdwarf-4 \
+    -c \
+    tea.c \
+    -o tea.o
+
+if [ $? -ne 0 ]; then
+    echo "tea.c compilation failed"
+    exit 1
+fi
+
+# Compile math assembly source to object file
+riscv64-unknown-elf-gcc \
+    -march=rv32im \
+    -mabi=ilp32 \
+    -nostdlib \
+    -ffreestanding \
+    -g3 \
+    -gdwarf-4 \
+    -c \
+    tea_asm.s \
+    -o tea_asm.o
+
+if [ $? -ne 0 ]; then
+    echo "Math assembly compilation failed"
+    exit 1
+fi
+
 # Link object files together
 riscv64-unknown-elf-gcc \
     -march=rv32im \
@@ -65,12 +99,14 @@ riscv64-unknown-elf-gcc \
     startup.o \
     example.o \
     math_asm.o \
+    tea.o \
+    tea_asm.o \
     -T linker.ld \
     -o example.elf
 
 if [ $? -eq 0 ]; then
     echo "Build successful: example.elf created"
-    echo "Object files: example.o, math_asm.o"
+    echo "Object files: example.o, math_asm.o, tea.o, tea_asm.o"
 else
     echo "Linking failed"
     exit 1
