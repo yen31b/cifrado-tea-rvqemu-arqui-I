@@ -68,7 +68,7 @@ void print_unsigned(uint32_t num) {
 }
 
 
-// Imprime un bloque de 8 bytes en hexadecimal
+// print a 64-bit (8 bytes) block in hexadecimal
 void print_block_hex(uint32_t v[2]) {
     for (int i = 0; i < 2; i++) {
         for (int j = 28; j >= 0; j -= 4) {
@@ -79,9 +79,9 @@ void print_block_hex(uint32_t v[2]) {
     }
 }
 
-// Procesa una cadena: padding, cifrado, descifrado y muestra resultados
+// Procees a string block: padding, encryption, decryption
 void process_string(const char* str, uint32_t key[4]) {
-    print_string("Original: ");
+    print_string("Original block: ");
     print_string(str);
     print_string("\n");
 
@@ -110,17 +110,25 @@ void process_string(const char* str, uint32_t key[4]) {
 
         tea_decrypt_asm(v, key);
         print_string("Decrypted: ");
-        // Imprime como texto
-        for (int i = 0; i < 4; i++) print_char((v[0] >> (i * 8)) & 0xFF);
-        for (int i = 0; i < 4; i++) print_char((v[1] >> (i * 8)) & 0xFF);
+
+        //Show padding with '_' character
+        for (int i = 0; i < 4; i++) {
+            char c = (v[0] >> (i * 8)) & 0xFF;
+            if (c == 0) print_char('_');
+            else print_char(c);
+        }
+        for (int i = 0; i < 4; i++) {
+            char c = (v[1] >> (i * 8)) & 0xFF;
+            if (c == 0) print_char('_');
+            else print_char(c);
+        }
         print_string("\n");
     }
 }
 
 
-// Entry point for C program
 void main() {
-    // Pruebas previas (comentadas, puedes descomentar para comparar)
+    //----------------Tests TEA functions in C---------//
     /*
     // Test TEA encryption/decryption (C)
     uint32_t v[2] = {12345, 67890}; // Bloque de datos
@@ -176,14 +184,19 @@ void main() {
     print_string("\n");
     */
 
+    
+    //-------------Tests TEA functions in ASM with padding--------- //
+
    // predetermined blocks test 
     const char* test_strings[] = {
-        "Hola mundo",
+        "Hello world",
         "TEA RISC-V",
         "12345678",
-        "Test largo para padding"
+        "Long test to show padding",
+        "31/08/1997/02/08/2014",
+        "@#$&/()=?¿!¡*+~^[]{}<>;:.,-_"
     };
-    int num_tests = 4;
+    int num_tests = 6;
     uint32_t key[4] = {1, 2, 3, 4}; // key 128
     for (int t = 0; t < num_tests; t++) {
         print_string("\n---\n");
