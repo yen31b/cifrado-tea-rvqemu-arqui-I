@@ -186,8 +186,21 @@ void main() {
 
     
     //-------------Tests TEA functions in ASM with padding--------- //
+    //Test 1: Bloque unico
+    print_string("\nTest 1: Unique block\n");
+    const char* prueba1 = "HOLA1234";
+    uint32_t clave1[4] = {0x12345678, 0x9ABCDEF0, 0xFEDCBA98, 0x76543210};
+    process_string(prueba1, clave1);
 
-   // predetermined blocks test 
+    //Test 2: Multiples bloques
+    print_string("\nTest 2: MMultiple blocks\n");
+    const char* prueba2 = "Mensaje de prueba para TEA";
+    uint32_t clave2[4] = {0xA1B2C3D4, 0x1A2B3C4D, 0xDEADBEEF, 0xCAFEBABE};
+    process_string(prueba2, clave2);        
+
+   //Test blocks 
+
+   print_string("\n Other Tests blocks\n");
     const char* test_strings[] = {
         "Hello world",
         "TEA RISC-V",
@@ -199,7 +212,7 @@ void main() {
     int num_tests = 6;
     uint32_t key[4] = {1, 2, 3, 4}; // key 128
     for (int t = 0; t < num_tests; t++) {
-        print_string("\n---\n");
+        print_string("\n-----------\n");
         process_string(test_strings[t], key);
     }
 
