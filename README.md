@@ -90,7 +90,7 @@ Breakpoint 3 at 0x800008d0: file example.c, line 227.
 
 
 ### Resultados
-![Resultados mostrados en la terminal](https://cdn.discordapp.com/attachments/764741709627916288/1416275004135571537/image.png?ex=68c64062&is=68c4eee2&hm=092928288faa074442e56550041868c39889d028181f5f105faf5e9f56b92cee)
+![Resultados mostrados en la terminal](https://raw.githubusercontent.com/yen31b/images-yen/refs/heads/main/image.png)
 
 En la impresión de los resultados se decidió mostrar el proceso paso a paso de cada bloque que conforma el mensaje original. Primero se muestra el mensaje original ingresado, se interpreta este como un bloque en hexadecimal de 64 bits (8 bytes), se muestra el resultado del proceso de encriptado y luego el de desencriptado. Finalmente se muestra el resultado final de  todo el bloque. 
 
